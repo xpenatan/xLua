@@ -1,5 +1,4 @@
 import com.github.xpenatan.jParser.builder.BuildMultiTarget;
-import com.github.xpenatan.jParser.builder.BuildTarget;
 import com.github.xpenatan.jParser.builder.targets.AndroidTarget;
 import com.github.xpenatan.jParser.builder.targets.EmscriptenTarget;
 import com.github.xpenatan.jParser.builder.targets.LinuxTarget;

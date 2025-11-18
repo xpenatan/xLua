@@ -54,7 +54,7 @@ jobs:
         run: ./gradlew :lua:lua-build:lua_download_source
 
       - name: Build project
-        run: ./gradlew :lua:lua-build:build_project_windows64
+        run: ./gradlew :lua:lua-build:lua_build_project_windows64
 
       - name: Upload natives
         uses: actions/upload-artifact@v4
@@ -93,7 +93,7 @@ jobs:
         run: ./gradlew :lua:lua-build:lua_download_source
 
       - name: Build project
-        run: ./gradlew :lua:lua-build:build_project_linux64
+        run: ./gradlew :lua:lua-build:lua_build_project_linux64
 
       - name: Upload natives
         uses: actions/upload-artifact@v4
@@ -172,7 +172,7 @@ jobs:
         run: ./gradlew :lua:lua-build:lua_download_source
 
       - name: Build project
-        run: ./gradlew :lua:lua-build:build_project_teavm
+        run: ./gradlew :lua:lua-build:lua_build_project_teavm
 
       - name: Upload natives
         uses: actions/upload-artifact@v4
@@ -218,7 +218,7 @@ jobs:
         run: ./gradlew :lua:lua-build:lua_download_source
 
       - name: Build project
-        run: ./gradlew :lua:lua-build:build_project_android
+        run: ./gradlew :lua:lua-build:lua_build_project_android
         env:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 

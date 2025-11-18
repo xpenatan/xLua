@@ -18,6 +18,8 @@ object LibExt {
     const val gdxTeaVMVersion = "1.4.0"
     const val gdxImGuiVersion = "-SNAPSHOT"
     const val teaVMVersion = "0.13.0"
+
+    const val useRepoLibs = false
 }
 
 private fun getVersion(): String {

@@ -6,7 +6,8 @@ var libProjects = mutableSetOf(
     project(":lua:lua-core"),
     project(":lua:lua-desktop"),
     project(":lua:lua-teavm"),
-    project(":extensions:reg-utils")
+    project(":lua:lua-android"),
+    project(":extensions:lua-extension")
 )
 
 LibExt.isRelease = gradle.startParameter.taskNames.any { it == "publishRelease" }

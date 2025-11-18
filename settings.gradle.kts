@@ -4,14 +4,16 @@ include(":lua:lua-build")
 include(":lua:lua-core")
 include(":lua:lua-desktop")
 include(":lua:lua-teavm")
+include(":lua:lua-android")
 
-// Utils
-include(":extensions:reg-utils")
+// Extensions
+include(":extensions:lua-extension")
 
 // Examples
 include(":examples:basic:core")
 include(":examples:basic:desktop")
 include(":examples:basic:teavm")
+include(":examples:basic:android")
 
 // #### Use include build to use other project source directly. Just update the source path ####
 
