@@ -15,7 +15,7 @@ interface LuaState {
     long x_lua_getfield(long index, [Const] DOMString k);
 
     long x_lua_getglobal([Const] DOMString name);
-    long x_lua_geti(long index, long long i);
+    long x_lua_geti(long index, long i);
     long x_lua_getmetatable(long index);
     long x_lua_gettable(long index);
     long x_lua_gettop();
@@ -53,7 +53,7 @@ interface LuaState {
     void x_lua_pushcfunction(LuaFunction callback);
     [Const, Value] IDLString x_lua_pushfstring([Const] DOMString fmt);
     void x_lua_pushglobaltable();
-    void x_lua_pushinteger(long long n);
+    void x_lua_pushinteger(long n);
     void x_lua_pushlightuserdata(any n);
 //    IDLString x_lua_pushliteral([Const] DOMString s);
     [Const, Value] IDLString x_lua_pushlstring([Const] DOMString s, long len);
@@ -65,10 +65,10 @@ interface LuaState {
 
     long x_lua_rawequal(long index1, long index2);
     long x_lua_rawget(long index);
-    long x_lua_rawgeti(long index, long long n);
+    long x_lua_rawgeti(long index, long n);
 
     void x_lua_rawset(long index);
-    void x_lua_rawseti(long index, long long i);
+    void x_lua_rawseti(long index, long i);
 
     void x_lua_remove(long index);
     void x_lua_replace(long index);
@@ -77,7 +77,7 @@ interface LuaState {
 
     void x_lua_setfield(long index, [Const] DOMString k);
     void x_lua_setglobal([Const] DOMString name);
-    void x_lua_seti(long index, long long n);
+    void x_lua_seti(long index, long n);
     long x_lua_setuservalue(long index);
     long x_lua_setiuservalue(long index, long n);
     long x_lua_setmetatable(long index);
@@ -89,7 +89,7 @@ interface LuaState {
     long x_lua_toboolean(long index);
 //    lua_CFunction lua_tocfunction (lua_State *L, int index);
     void x_lua_toclose(long index);
-    long long x_lua_tointeger(long index);
+    long x_lua_tointeger(long index);
 //    lua_Integer lua_tointegerx (lua_State *L, int index, int *isnum);
 //    [Const, Value] IDLString x_lua_tolstring(long index, size_t* len);
     double x_lua_tonumber(long index);
@@ -120,7 +120,7 @@ interface LuaState {
     long x_luaL_getmetatable([Const] DOMString tname);
     long x_luaL_getsubtable(long idx, [Const] DOMString fname);
 
-    long long x_luaL_len(long index);
+    long x_luaL_len(long index);
 
     void x_luaL_pushfail();
 
@@ -141,7 +141,6 @@ interface LuaState {
 };
 
 interface LuaFunction {
-    void onCall(LuaState luaState);
 };
 
 [JSImplementation="LuaFunction"]

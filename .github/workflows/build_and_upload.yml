@@ -9,44 +9,200 @@ on:
       shouldUpload:
         required: true
         type: boolean
-    secrets:
-      USER:
-        required: true
-      PASSWORD:
-        required: true
-      PGP_SECRET:
-        required: true
-      PGP_PASSPHRASE:
-        required: true
 
 env:
-  RELEASE: ${{ inputs.isRelease }}
+  CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+  CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+  SIGNING_KEY: ${{ secrets.PGP_SECRET }}
+  SIGNING_PASSWORD: ${{ secrets.PGP_PASSPHRASE }}
 
 jobs:
-  build_Linux:
-    name: Build Windows/Linux
+  build_windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: 17
+
+      - name: Set up MinGW
+        uses: msys2/setup-msys2@v2
+
+      - name: Set up Developer Command Prompt
+        uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+
+      - name: Append the directory of 'vcvarsall.bat' to PATH environment variable
+        uses: myci-actions/export-env-var-powershell@1
+        with:
+          name: PATH
+          value: $env:PATH;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build
+
+      - name: Download sources
+        run: ./gradlew :lua:lua-build:lua_download_source
+
+      - name: Build project
+        run: ./gradlew :lua:lua-build:build_project_windows64
+
+      - name: Upload natives
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-natives
+          path: ./lua/lua-build/build/c++/libs/
+          if-no-files-found: error
+
+  build_linux:
+    name: Build Linux
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: 17
+
+      - name: Set up MinGW
+        run: |
+          sudo apt install -y --force-yes mingw-w64 lib32z1
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Download sources
+        run: ./gradlew :lua:lua-build:lua_download_source
+
+      - name: Build project
+        run: ./gradlew :lua:lua-build:build_project_linux64
+
+      - name: Upload natives
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-natives
+          path: ./lua/lua-build/build/c++/libs/
+          if-no-files-found: error
+
+  build_mac:
+    name: Build Mac
+    runs-on: macos-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: 17
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Download sources
+        run: ./gradlew :lua:lua-build:lua_download_source
+
+      - name: Build project
+        run: ./gradlew :lua:lua-build:build_project_mac64 :lua:lua-build:build_project_macArm
+
+      - name: Upload natives
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-natives
+          path: ./lua/lua-build/build/c++/libs/
+          if-no-files-found: error
+
+  build_teavm:
+    name: Build TeaVM
     runs-on: ubuntu-latest
 
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.0
+        uses: styfle/cancel-workflow-action@0.12.1
         with:
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          distribution: "zulu"
-          java-version: 11
+          distribution: "corretto"
+          java-version: 17
 
       - name: Set up MinGW
         run: |
           sudo apt install -y --force-yes mingw-w64 lib32z1
 
       - name: Install emscripten
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 4.0.18
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Download sources
+        run: ./gradlew :lua:lua-build:lua_download_source
+
+      - name: Build project
+        run: ./gradlew :lua:lua-build:build_project_teavm
+
+      - name: Upload natives
+        uses: actions/upload-artifact@v4
+        with:
+          name: teavm-natives
+          path: ./lua/lua-build/build/c++/libs/
+          if-no-files-found: error
+
+  build_android:
+    name: Build Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: 17
+
+      - name: Set up MinGW
+        run: |
+          sudo apt install -y --force-yes mingw-w64 lib32z1
 
       - name: Install NDK
         id: setup-ndk
@@ -58,54 +214,140 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Download Lua source
-        run: ./gradlew :lua:lua-build:download_source
+      - name: Download sources
+        run: ./gradlew :lua:lua-build:lua_download_source
 
-      - name: Build Lua
-        run: ./gradlew :lua:lua-build:build_project
+      - name: Build project
+        run: ./gradlew :lua:lua-build:build_project_android
         env:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
-      - name: Upload Lua natives
-        uses: actions/upload-artifact@v3
+      - name: Upload natives
+        uses: actions/upload-artifact@v4
         with:
-          name: lua-natives
+          name: android-natives
           path: ./lua/lua-build/build/c++/libs/
+          if-no-files-found: error
 
-  build_Mac:
-    name: Build Mac OS
-    runs-on: macos-11
-    needs: build_Linux
+  upload_natives:
+    name: Upload Natives
+    needs: [build_windows, build_linux, build_mac, build_android, build_teavm]
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
         with:
-          distribution: "zulu"
-          java-version: 11
+          access_token: ${{ github.token }}
 
-      - name: Download lua natives natives
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        uses: madhead/read-java-properties@latest
+        id: version
         with:
-          name: lua-natives
-          path: ./lua/lua-build/build/c++/libs/
+          file: "./gradle.properties"
+          property: version
+          default: 0.0.1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: 17
+
+      - name: Set up MinGW
+        run: |
+          sudo apt install -y --force-yes mingw-w64 lib32z1
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Download Lua source
-        run: ./gradlew :lua:lua-build:download_source
+      - name: Download windows natives
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-natives
+          path: ./lua/lua-build/build/c++/libs/
 
-      - name: Build Lua
+      - name: Download linux natives
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-natives
+          path: ./lua/lua-build/build/c++/libs/
+
+      - name: Download mac natives
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-natives
+          path: ./lua/lua-build/build/c++/libs/
+
+      - name: Download android natives
+        uses: actions/download-artifact@v4
+        with:
+          name: android-natives
+          path: ./lua/lua-build/build/c++/libs/
+
+      - name: Download teavm natives
+        uses: actions/download-artifact@v4
+        with:
+          name: teavm-natives
+          path: ./lua/lua-build/build/c++/libs/
+
+      - name: Delete generated files
+        run: |
+          rm -rf lua/lua-core/src/main/java/*
+          rm -rf lua/lua-teavm/src/main/java/*
+          echo "Deleted generated files"
+
+      - name: Generate Lua classes
         run: ./gradlew :lua:lua-build:build_project
 
-      - name: Upload to repository
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "bot@github.com"
+
+      - name: Commit generated code
         if: ${{ inputs.shouldUpload }}
-        run: ./gradlew publish
-        env:
-          USER: ${{ secrets.USER }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          SIGNING_KEY: ${{ secrets.PGP_SECRET }}
-          SIGNING_PASSWORD: ${{ secrets.PGP_PASSPHRASE }}
+        run: |
+          git add .
+          git commit -m "Commit generated code" || echo "No changes to commit"
+          git push origin HEAD
+
+      - name: Upload Release to repository
+        uses: nick-fields/retry@v3
+        if: ${{ inputs.shouldUpload && inputs.isRelease }}
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          retry_on: error
+          command: ./gradlew publishRelease
+
+      - name: Upload Snapshot to repository
+        uses: nick-fields/retry@v3
+        if: ${{ inputs.shouldUpload && !inputs.isRelease }}
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          retry_on: error
+          command: ./gradlew publishSnapshot
+
+      - name: Create Git tag
+        uses: actions/github-script@v7
+        if: ${{ inputs.isRelease }}
+        with:
+          script: |
+            const versionOutputs = ${{ toJSON(steps.version.outputs) }};
+            
+            var version = versionOutputs.value;
+            
+            console.log("Version: " + version);
+            
+            var ref = "refs/tags/" + version
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: ref,
+              sha: context.sha
+            });

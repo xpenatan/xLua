@@ -1,4 +1,5 @@
 plugins {
+    id("java")
     id("org.gretty") version("3.1.0")
 }
 
@@ -14,23 +15,28 @@ dependencies {
 
     implementation("com.badlogicgames.gdx:gdx:${LibExt.gdxVersion}")
     implementation("com.github.xpenatan.gdx-teavm:backend-teavm:${LibExt.gdxTeaVMVersion}")
-    implementation("com.github.xpenatan.gdx-imgui:imgui-ext-teavm:${LibExt.gdxImGuiVersion}")
+    implementation("com.github.xpenatan.xImGui:imgui-ext-teavm:${LibExt.gdxImGuiVersion}")
 }
 
-val mainClassName = "lua.example.basic.Build"
+java {
+    sourceCompatibility = JavaVersion.toVersion(LibExt.java11Target)
+    targetCompatibility = JavaVersion.toVersion(LibExt.java11Target)
+}
 
-tasks.register<JavaExec>("basic-build-teavm") {
+val mainClassName = "lua.examples.basic.Build"
+
+tasks.register<JavaExec>("lua_basic_build_teavm") {
     group = "example-teavm"
     description = "Build basic example"
     mainClass.set(mainClassName)
     classpath = sourceSets["main"].runtimeClasspath
 }
 
-tasks.register("basic-run-teavm") {
+tasks.register("lua_basic_run_teavm") {
     group = "example-teavm"
     description = "Run teavm app"
-    val list = listOf("basic-build-teavm", "jettyRun")
+    val list = listOf("lua_basic_build_teavm", "jettyRun")
     dependsOn(list)
 
-    tasks.findByName("jettyRun")?.mustRunAfter("basic-build-teavm")
+    tasks.findByName("jettyRun")?.mustRunAfter("lua_basic_build_teavm")
 }

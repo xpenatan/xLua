@@ -1,14 +1,24 @@
-val moduleName = "lua-core"
-
-val genPath = File("$projectDir/../lua-cpp/src/main/java")
-println("Path " + genPath.canonicalPath)
-sourceSets["main"].java {
-    srcDir(genPath)
+plugins {
+    id("java-library")
 }
 
+val moduleName = "lua-core"
+
 dependencies {
-    implementation("com.github.xpenatan.jParser:loader-core:${LibExt.jParserVersion}")
-    implementation("com.badlogicgames.gdx:gdx:${LibExt.gdxVersion}")
+    api("com.github.xpenatan.jParser:loader-core:${LibExt.jParserVersion}")
+    api("com.github.xpenatan.jParser:idl-core:${LibExt.jParserVersion}")
+}
+
+tasks.named("clean") {
+    doFirst {
+        val srcPath = "$projectDir/src/main/java"
+        project.delete(files(srcPath))
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion(LibExt.java8Target)
+    targetCompatibility = JavaVersion.toVersion(LibExt.java8Target)
 }
 
 java {
@@ -20,6 +30,8 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             artifactId = moduleName
+            group = LibExt.groupId
+            version = LibExt.libVersion
             from(components["java"])
         }
     }

@@ -9,7 +9,6 @@ target/
 test-classes/
 war/
 gwt-unitCache/
-gen/
 dist/
 **/webapp/assets
 .gradle/
@@ -32,6 +31,4 @@ libs/
 *.o
 *.ini
 
-**/lua/lua-cpp/src/main/java/**
-**/lua/lua-teavm/src/main/java/**
 **/webapp/**
