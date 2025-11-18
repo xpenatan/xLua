@@ -113,7 +113,7 @@ public class Build {
         // Compile glue code and link
         LinuxTarget linkTarget = new LinuxTarget();
         linkTarget.addJNIHeaders();
-        linkTarget.cppFlags.add("-std:c++17");
+        linkTarget.cppFlags.add("-std=c++17");
         linkTarget.headerDirs.add("-I" + sourceDir);
         linkTarget.headerDirs.add("-I" + op.getCustomSourceDir());
         linkTarget.linkerFlags.add(libBuildCPPPath + "/libs/linux/liblua64_.a");
@@ -141,7 +141,7 @@ public class Build {
         // Compile glue code and link
         MacTarget linkTarget = new MacTarget(isArm);
         linkTarget.addJNIHeaders();
-        linkTarget.cppFlags.add("-std:c++17");
+        linkTarget.cppFlags.add("-std=c++17");
         linkTarget.headerDirs.add("-I" + sourceDir);
         linkTarget.headerDirs.add("-I" + op.getCustomSourceDir());
         if(isArm) {
