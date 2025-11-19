@@ -301,7 +301,7 @@ jobs:
           echo "Deleted generated files"
 
       - name: Generate Lua classes
-        run: ./gradlew :lua:lua-build:build_project
+        run: ./gradlew :lua:lua-build:lua_build_project
 
       - name: Configure Git
         run: |
