@@ -128,7 +128,7 @@ jobs:
         run: ./gradlew :lua:lua-build:lua_download_source
 
       - name: Build project
-        run: ./gradlew :lua:lua-build:build_project_mac64 :lua:lua-build:build_project_macArm
+        run: ./gradlew :lua:lua-build:lua_build_project_mac64 :lua:lua-build:lua_build_project_macArm
 
       - name: Upload natives
         uses: actions/upload-artifact@v4
