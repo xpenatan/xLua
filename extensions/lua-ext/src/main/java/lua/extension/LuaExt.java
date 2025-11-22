@@ -9,7 +9,7 @@ import lua.idl.helper.IDLString;
 import lua.extension.register.DefaultImportFunction;
 import lua.extension.register.ImportListener;
 
-public class LuaExtension {
+public class LuaExt {
 
     LuaState luaState;
 
@@ -17,7 +17,7 @@ public class LuaExtension {
 
     public IntMap<Object> luaJavaInstances;
 
-    public LuaExtension() {
+    public LuaExt() {
         importMap = new HashMap<>();
         luaState = new LuaState();
         luaState.createContext();
@@ -107,7 +107,7 @@ public class LuaExtension {
         importMap.remove(key);
     }
 
-    void register(LuaExtension lua) {
+    void register(LuaExt lua) {
         LuaFunction function = new DefaultImportFunction() {
             @Override
             public int onImport(LuaState luaState) {

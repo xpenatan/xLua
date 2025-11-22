@@ -1,7 +1,7 @@
 package lua.example.basic.register.gdx.graphics;
 
 import com.badlogic.gdx.Gdx;
-import lua.extension.LuaExtension;
+import lua.extension.LuaExt;
 import lua.LuaFunction;
 import lua.extension.LuaLibrary;
 import lua.LuaState;
@@ -11,7 +11,7 @@ public class LuaGraphics {
 
     public static final String CLASSNAME = "com.badlogic.gdx.Graphics";
 
-    public static void register(LuaExtension lua) {
+    public static void register(LuaExt lua) {
         LuaState luaState = lua.getLuaState();
 
         LuaLibrary.registerClass(lua, CLASSNAME, false, false);

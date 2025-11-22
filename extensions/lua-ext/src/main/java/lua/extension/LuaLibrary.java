@@ -18,7 +18,7 @@ public class LuaLibrary {
 
     private static final String t = "Lua does not contains java instance";
 
-    public static Object getJavaInstance(LuaExtension lua, LuaState luaState) {
+    public static Object getJavaInstance(LuaExt lua, LuaState luaState) {
         if(luaState.lua_istable(1) != 0) {
             luaState.lua_getfield(1, LuaLibrary.LUA_J_HASH);
             if(luaState.lua_isnil(-1) != 0) {
@@ -52,7 +52,7 @@ public class LuaLibrary {
      * If parent exist, it will create or get as a child.
      * If parent don't exist, it will create a global table.
      */
-    private static void getOrCreateTable(LuaExtension lua, String table) {
+    private static void getOrCreateTable(LuaExt lua, String table) {
         LuaState luaState = lua.luaState;
         boolean hasParentTable = luaState.lua_istable(-1) != 0;
         if(!hasParentTable) {
@@ -80,7 +80,7 @@ public class LuaLibrary {
         }
     }
 
-    private static void getOrCreateTables(LuaExtension lua, String fullPath) {
+    private static void getOrCreateTables(LuaExt lua, String fullPath) {
         String[] split = fullPath.split("\\.");
         for(int i = 0; i < split.length; i++) {
             String name = split[i];
@@ -88,7 +88,7 @@ public class LuaLibrary {
         }
     }
 
-    public static void addLibrary(LuaExtension lua, String fullPackage, LuaFunction function) {
+    public static void addLibrary(LuaExt lua, String fullPackage, LuaFunction function) {
         LuaState luaState = lua.luaState;
         String[] split = fullPackage.split("\\.");
         String lastItem = split[split.length - 1];
@@ -106,7 +106,7 @@ public class LuaLibrary {
     /**
      * Will create tables and keep the last table into stack
      */
-    public static void getOrCreateClass(LuaExtension lua, Class<?> clazz) {
+    public static void getOrCreateClass(LuaExt lua, Class<?> clazz) {
         String name = clazz.getName();
         getOrCreateTables(lua, name);
     }
@@ -115,7 +115,7 @@ public class LuaLibrary {
      * Get and push meta table to top of stack. Return false if it doesn't exist. <br>
      * It's your responsibility to pop the table from stack.
      */
-    public static boolean getMetaClass(LuaExtension lua, String className) {
+    public static boolean getMetaClass(LuaExt lua, String className) {
         LuaState luaState = lua.luaState;
         luaState.luaL_getmetatable(className);
         if(luaState.lua_isnil(-1) != 0) {
@@ -134,7 +134,7 @@ public class LuaLibrary {
      * Get and push class table to top of stack. Return false if it doesn't exist. <br>
      * It's your responsibility to pop the table from stack.
      */
-    public static boolean getMetaClassTable(LuaExtension lua, LuaTableType type, String className) {
+    public static boolean getMetaClassTable(LuaExt lua, LuaTableType type, String className) {
         if(getMetaClass(lua, className)) {
             LuaState luaState = lua.luaState;
             if(type == LuaTableType.CLASS) {
@@ -176,7 +176,7 @@ public class LuaLibrary {
     /**
      * Create enum table and push to stack.
      */
-    public static boolean createEnumTable(LuaExtension lua, List<LuaIntEnumData> enumList) {
+    public static boolean createEnumTable(LuaExt lua, List<LuaIntEnumData> enumList) {
         if(enumList == null || enumList.isEmpty())
             return false;
         LuaState luaState = lua.luaState;
@@ -211,7 +211,7 @@ public class LuaLibrary {
      * Set a table variable to template or class table. The table variable must be on top of the stack.
      * Will pop table variable if it's true.
      */
-    public static boolean setMetaClassTable(LuaExtension lua, LuaTableType type, String className, String variableName) {
+    public static boolean setMetaClassTable(LuaExt lua, LuaTableType type, String className, String variableName) {
         LuaState luaState = lua.luaState;
         if(luaState.lua_istable(-1) != 0) {
             if(getMetaClassTable(lua, type, className)) {
@@ -227,7 +227,7 @@ public class LuaLibrary {
     /**
      * Set a string variable to template or class table
      */
-    public static boolean setMetaClassString(LuaExtension lua, LuaTableType type, String className, String variableName, String value) {
+    public static boolean setMetaClassString(LuaExt lua, LuaTableType type, String className, String variableName, String value) {
         LuaState luaState = lua.luaState;
         if(getMetaClassTable(lua, type, className)) {
             luaState.lua_pushstring(value);
@@ -241,7 +241,7 @@ public class LuaLibrary {
     /**
      * Set a int variable to template or class table
      */
-    public static boolean setMetaClassInt(LuaExtension lua, LuaTableType type, String className, String variableName, int value) {
+    public static boolean setMetaClassInt(LuaExt lua, LuaTableType type, String className, String variableName, int value) {
         LuaState luaState = lua.luaState;
         if(getMetaClassTable(lua, type, className)) {
             luaState.lua_pushinteger(value);
@@ -255,7 +255,7 @@ public class LuaLibrary {
     /**
      * Set a float variable to template or class table
      */
-    public static boolean setMetaClassFloat(LuaExtension lua, LuaTableType type, String className, String variableName, float value) {
+    public static boolean setMetaClassFloat(LuaExt lua, LuaTableType type, String className, String variableName, float value) {
         LuaState luaState = lua.luaState;
         if(getMetaClassTable(lua, type, className)) {
             luaState.lua_pushnumber(value);
@@ -269,7 +269,7 @@ public class LuaLibrary {
     /**
      * Add class function. MetaClass must exist
      */
-    public static boolean setMetaClassFunction(LuaExtension lua, LuaTableType type, String className, String functionName, LuaFunction function) {
+    public static boolean setMetaClassFunction(LuaExt lua, LuaTableType type, String className, String functionName, LuaFunction function) {
         LuaState luaState = lua.luaState;
         if(getMetaClassTable(lua, type, className)) {
             if(lua.registerFunction(functionName, function)) {
@@ -284,7 +284,7 @@ public class LuaLibrary {
      * Will register new method to class.
      * Must create MetaClass Template first
      */
-    public static boolean setClassNewFunction(LuaExtension lua, String className, LuaCreateClass listener) {
+    public static boolean setClassNewFunction(LuaExt lua, String className, LuaCreateClass listener) {
         if(getMetaClassTable(lua, LuaTableType.CLASS, className)) {
             // Put new function inside class table
             {
@@ -304,7 +304,7 @@ public class LuaLibrary {
         return false;
     }
 
-    public static boolean registerMetaClassTableNewIndex(LuaExtension lua, LuaTableType type, String className, LuaFunction luaFunction) {
+    public static boolean registerMetaClassTableNewIndex(LuaExt lua, LuaTableType type, String className, LuaFunction luaFunction) {
         if(getMetaClassTable(lua, type, className)) {
             if(lua.registerFunction("__newindex", luaFunction)) {
                 lua.luaState.lua_pop(1);
@@ -317,7 +317,7 @@ public class LuaLibrary {
     /**
      * Create a lua instance. Require MetaClass template table.
      */
-    public static boolean createInstanceObject(LuaExtension lua, String className, Object classObject) {
+    public static boolean createInstanceObject(LuaExt lua, String className, Object classObject) {
         LuaState luaState = lua.luaState;
 
         if(classObject == null) {
@@ -351,7 +351,7 @@ public class LuaLibrary {
      * Register MetaClass. Use lua code 'MYCLASS = java.import("class full path")' to obtain lua class object.
      * canInstantiate true means that this class can be created with new function or createInstanceObject.
      */
-    public static boolean registerClass(LuaExtension lua, String className, boolean addImport, boolean canInstantiate) {
+    public static boolean registerClass(LuaExt lua, String className, boolean addImport, boolean canInstantiate) {
         LuaState luaState = lua.luaState;
         SKIP_ERROR_LOG = true;
         if(getMetaClass(lua, className)) {
@@ -386,7 +386,7 @@ public class LuaLibrary {
         return true;
     }
 
-    public static boolean registerEnum(LuaExtension lua, String enumName) {
+    public static boolean registerEnum(LuaExt lua, String enumName) {
         LuaState luaState = lua.luaState;
         if(getMetaClass(lua, enumName)) {
             luaState.lua_pop(1);
@@ -401,7 +401,7 @@ public class LuaLibrary {
         return true;
     }
 
-    private static void createMetaClassTemplate(LuaExtension lua, String metaTable) {
+    private static void createMetaClassTemplate(LuaExt lua, String metaTable) {
         LuaState luaState = lua.luaState;
         luaState.luaL_getmetatable(metaTable);
 
@@ -440,7 +440,7 @@ public class LuaLibrary {
         luaState.lua_pop(1);
     }
 
-    private static void createMetaClassClass(LuaExtension lua, String metaTable) {
+    private static void createMetaClassClass(LuaExt lua, String metaTable) {
         LuaState luaState = lua.luaState;
         luaState.luaL_getmetatable(metaTable);
 
@@ -465,7 +465,7 @@ public class LuaLibrary {
         luaState.lua_pop(1);
     }
 
-    private static void createMetaClassEnum(LuaExtension lua, String enumName) {
+    private static void createMetaClassEnum(LuaExt lua, String enumName) {
         LuaState luaState = lua.luaState;
         luaState.luaL_getmetatable(enumName);
 

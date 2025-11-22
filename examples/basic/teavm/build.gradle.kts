@@ -10,7 +10,13 @@ gretty {
 
 dependencies {
     implementation(project(":examples:basic:core"))
-    implementation(project(":lua:lua-teavm"))
+
+    if(LibExt.useRepoLibs) {
+        implementation("com.github.xpenatan.xLua:lua-teavm:-SNAPSHOT")
+    }
+    else {
+        implementation(project(":lua:lua-teavm"))
+    }
 
     implementation("com.badlogicgames.gdx:gdx:${LibExt.gdxVersion}")
     implementation("com.github.xpenatan.gdx-teavm:backend-teavm:${LibExt.gdxTeaVMVersion}")

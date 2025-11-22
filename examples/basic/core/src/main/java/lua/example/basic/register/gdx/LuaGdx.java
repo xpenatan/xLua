@@ -1,6 +1,6 @@
 package lua.example.basic.register.gdx;
 
-import lua.extension.LuaExtension;
+import lua.extension.LuaExt;
 import lua.extension.LuaLibrary;
 import lua.extension.LuaTableType;
 import lua.example.basic.register.gdx.graphics.LuaGL20;
@@ -10,7 +10,7 @@ import lua.example.basic.register.gdx.graphics.glutils.LuaShapeRenderer;
 public class LuaGdx {
     public static final String CLASSNAME = "com.badlogic.gdx.Gdx";
 
-    public static void register(LuaExtension lua) {
+    public static void register(LuaExt lua) {
         LuaGL20.register(lua);
         LuaGraphics.register(lua);
         LuaShapeRenderer.register(lua);

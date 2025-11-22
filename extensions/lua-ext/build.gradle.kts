@@ -2,7 +2,7 @@ plugins {
     id("java-library")
 }
 
-val moduleName = "lua-extension"
+val moduleName = "lua-ext"
 
 
 dependencies {

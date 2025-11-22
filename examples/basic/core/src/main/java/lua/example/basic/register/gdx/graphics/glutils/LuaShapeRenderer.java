@@ -3,7 +3,7 @@ package lua.example.basic.register.gdx.graphics.glutils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.ArrayList;
 import lua.extension.register.DefaultNewIndexFunction;
-import lua.extension.LuaExtension;
+import lua.extension.LuaExt;
 import lua.LuaFunction;
 import lua.extension.LuaLibrary;
 import lua.LuaState;
@@ -13,7 +13,7 @@ import lua.extension.register.LuaIntEnumData;
 
 public class LuaShapeRenderer {
 
-    public static void register(LuaExtension lua) {
+    public static void register(LuaExt lua) {
         LuaState luaState = lua.getLuaState();
 
         String rendererClassName = "com.badlogic.gdx.graphics.glutils.ShapeRenderer";

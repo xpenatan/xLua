@@ -6,7 +6,13 @@ plugins {
 
 dependencies {
     implementation(project(":examples:basic:core"))
-    implementation(project(":lua:lua-desktop"))
+
+    if(LibExt.useRepoLibs) {
+        implementation("com.github.xpenatan.xLua:lua-desktop:-SNAPSHOT")
+    }
+    else {
+        implementation(project(":lua:lua-desktop"))
+    }
 
     implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:${LibExt.gdxVersion}")
     implementation("com.badlogicgames.gdx:gdx-platform:${LibExt.gdxVersion}:natives-desktop")

@@ -14,7 +14,7 @@ import com.github.xpenatan.jParser.idl.IDLBase;
 //import imgui.idl.helper.IDLInt;
 //import imgui.idl.helper.IDLTemp;
 import lua.extension.LuaErrorStatus;
-import lua.extension.LuaExtension;
+import lua.extension.LuaExt;
 import lua.LuaState;
 import lua.example.basic.register.gdx.LuaGdx;
 
@@ -22,7 +22,7 @@ public class BasicExample extends ScreenAdapter {
 
 //    private TextEditor editor;
     private SpriteBatch batch;
-    public LuaExtension lua;
+    public LuaExt lua;
     boolean luaError;
 
     ShapeRenderer renderer = new ShapeRenderer();
@@ -37,7 +37,7 @@ public class BasicExample extends ScreenAdapter {
 
         String code = Gdx.files.internal("data/script.lua").readString();
 //        editor.SetText(code);
-        lua = new LuaExtension();
+        lua = new LuaExt();
 
         LuaState luaState = lua.getLuaState();
 

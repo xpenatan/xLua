@@ -7,7 +7,7 @@ include(":lua:lua-teavm")
 include(":lua:lua-android")
 
 // Extensions
-include(":extensions:lua-extension")
+include(":extensions:lua-ext")
 
 // Examples
 include(":examples:basic:core")
