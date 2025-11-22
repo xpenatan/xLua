@@ -14,7 +14,7 @@ public class LuaGraphics {
     public static void register(LuaExt lua) {
         LuaState luaState = lua.getLuaState();
 
-        LuaLibrary.registerClass(lua, CLASSNAME, false, false);
+        LuaLibrary.registerClass(lua, CLASSNAME, false, null);
 
         LuaLibrary.setMetaClassFunction(lua, LuaTableType.CLASS, CLASSNAME, "getWidth", new LuaFunction() {
             @Override

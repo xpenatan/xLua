@@ -9,7 +9,7 @@ import lua.extension.register.LuaIntEnumData;
 
 public class LuaLibrary {
 
-    public static final String LUA_J_HASH = "java_hash";
+    public static final String LUA_J_ID = "java_id";
     private static final String INSTANCE = "Instance";
     private static final String CLASS = "Class";
     private static final String ENUM = "Enum";
@@ -18,33 +18,29 @@ public class LuaLibrary {
 
     private static final String t = "Lua does not contains java instance";
 
-    public static Object getJavaInstance(LuaExt lua, LuaState luaState) {
+    public static int getJavaInstanceId(LuaState luaState) {
         if(luaState.lua_istable(1) != 0) {
-            luaState.lua_getfield(1, LuaLibrary.LUA_J_HASH);
+            luaState.lua_getfield(1, LuaLibrary.LUA_J_ID);
             if(luaState.lua_isnil(-1) != 0) {
                 luaState.lua_pop(1);
                 luaState.luaL_error(t);
-                return null;
+                return 0;
             }
             else {
                 if(luaState.lua_isinteger(-1) == 0) {
                     luaState.lua_pop(1);
                     luaState.luaL_error(t);
-                    return null;
+                    return 0;
                 }
                 else {
-                    int hash = luaState.lua_tointeger(-1);
+                    int id = luaState.lua_tointeger(-1);
                     luaState.lua_pop(1);
-                    Object o = lua.luaJavaInstances.get(hash);
-                    if(o == null) {
-                        luaState.luaL_error("Java object instance is null");
-                    }
-                    return o;
+                    return id;
                 }
             }
         }
         luaState.luaL_error(t);
-        return null;
+        return 0;
     }
 
     /**
@@ -284,15 +280,15 @@ public class LuaLibrary {
      * Will register new method to class.
      * Must create MetaClass Template first
      */
-    public static boolean setClassNewFunction(LuaExt lua, String className, LuaCreateClass listener) {
+    private static boolean setClassNewFunction(LuaExt lua, String className, LuaCreateClass listener) {
         if(getMetaClassTable(lua, LuaTableType.CLASS, className)) {
             // Put new function inside class table
             {
                 lua.registerFunction("new", new LuaFunction() {
                     @Override
                     public int onCall(LuaState luaState) {
-                        Object classObject = listener.onCreateClass(luaState);
-                        createInstanceObject(lua, className, classObject);
+                        int javaInstanceId = listener.onCreateJavaInstance(luaState);
+                        createInstanceObject(lua, className, javaInstanceId);
                         return 1;
                     }
                 });
@@ -317,11 +313,11 @@ public class LuaLibrary {
     /**
      * Create a lua instance. Require MetaClass template table.
      */
-    public static boolean createInstanceObject(LuaExt lua, String className, Object classObject) {
+    public static boolean createInstanceObject(LuaExt lua, String className, int javaInstanceId) {
         LuaState luaState = lua.luaState;
 
-        if(classObject == null) {
-            luaState.luaL_error("Class object cannot be null");
+        if(javaInstanceId == 0) {
+            luaState.luaL_error("Java instance id cannot be 0");
             return false;
         }
 
@@ -329,10 +325,8 @@ public class LuaLibrary {
 
         // Put hash key
         {
-            int objectHash = classObject.hashCode();
-            lua.addObjectInstance(objectHash, classObject);
-            luaState.lua_pushinteger(objectHash);
-            luaState.lua_setfield(-2, LUA_J_HASH);
+            luaState.lua_pushinteger(javaInstanceId);
+            luaState.lua_setfield(-2, LUA_J_ID);
         }
 
         //Put metatable to the new created table
@@ -351,7 +345,7 @@ public class LuaLibrary {
      * Register MetaClass. Use lua code 'MYCLASS = java.import("class full path")' to obtain lua class object.
      * canInstantiate true means that this class can be created with new function or createInstanceObject.
      */
-    public static boolean registerClass(LuaExt lua, String className, boolean addImport, boolean canInstantiate) {
+    public static boolean registerClass(LuaExt lua, String className, boolean addImport, LuaCreateClass instanceCreation) {
         LuaState luaState = lua.luaState;
         SKIP_ERROR_LOG = true;
         if(getMetaClass(lua, className)) {
@@ -364,8 +358,9 @@ public class LuaLibrary {
 
         createMetaClassClass(lua, className);
 
-        if(canInstantiate) {
-            createMetaClassTemplate(lua, className);
+        if(instanceCreation != null) {
+            createMetaClassTemplate(lua, className, instanceCreation);
+            setClassNewFunction(lua, className, instanceCreation);
         }
 
         if(addImport) {
@@ -401,7 +396,7 @@ public class LuaLibrary {
         return true;
     }
 
-    private static void createMetaClassTemplate(LuaExt lua, String metaTable) {
+    private static void createMetaClassTemplate(LuaExt lua, String metaTable, LuaCreateClass instanceCreation) {
         LuaState luaState = lua.luaState;
         luaState.luaL_getmetatable(metaTable);
 
@@ -425,10 +420,10 @@ public class LuaLibrary {
                 lua.registerFunction("__gc", new LuaFunction() {
                     @Override
                     public int onCall(LuaState luaState) {
-                        luaState.lua_getfield(-1, LUA_J_HASH);
+                        luaState.lua_getfield(-1, LUA_J_ID);
                         if(luaState.lua_isinteger(-1) != 0) {
-                            int hash = luaState.lua_tointeger(-1);
-                            lua.removeObjectInstance(hash);
+                            int javaInstanceId = luaState.lua_tointeger(-1);
+                            instanceCreation.onDisposeJavaInstance(javaInstanceId);
                         }
                         return 0;
                     }

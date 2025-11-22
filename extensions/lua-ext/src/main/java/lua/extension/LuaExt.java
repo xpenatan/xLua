@@ -1,6 +1,5 @@
 package lua.extension;
 
-import com.badlogic.gdx.utils.IntMap;
 import com.github.xpenatan.jParser.idl.IDLBase;
 import java.util.HashMap;
 import lua.LuaFunction;
@@ -15,14 +14,10 @@ public class LuaExt {
 
     private final HashMap<String, ImportListener> importMap;
 
-    public IntMap<Object> luaJavaInstances;
-
     public LuaExt() {
         importMap = new HashMap<>();
         luaState = new LuaState();
         luaState.createContext();
-        luaJavaInstances = new IntMap<>();
-
         register(this);
     }
 
@@ -88,15 +83,6 @@ public class LuaExt {
             status.error = idlString.c_str();
         }
         return status;
-    }
-
-    void addObjectInstance(int key, Object object) {
-        luaJavaInstances.put(object.hashCode(), object);
-    }
-
-    boolean removeObjectInstance(int hash) {
-        Object remove = luaJavaInstances.remove(hash);
-        return remove != null;
     }
 
     public void addImportListener(String key, ImportListener importListener) {

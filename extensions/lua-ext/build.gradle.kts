@@ -7,7 +7,6 @@ val moduleName = "lua-ext"
 
 dependencies {
     implementation(project(":lua:lua-core"))
-    implementation("com.badlogicgames.gdx:gdx:${LibExt.gdxVersion}")
 }
 
 java {

@@ -1,6 +1,7 @@
 package lua.example.basic.register.gdx.graphics.glutils;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.IntMap;
 import java.util.ArrayList;
 import lua.extension.register.DefaultNewIndexFunction;
 import lua.extension.LuaExt;
@@ -13,12 +14,28 @@ import lua.extension.register.LuaIntEnumData;
 
 public class LuaShapeRenderer {
 
+    public static IntMap<Object> luaJavaInstances = new IntMap<>();
+
     public static void register(LuaExt lua) {
         LuaState luaState = lua.getLuaState();
 
         String rendererClassName = "com.badlogic.gdx.graphics.glutils.ShapeRenderer";
 
-        LuaLibrary.registerClass(lua, rendererClassName, true, true);
+        LuaLibrary.registerClass(lua, rendererClassName, true, new LuaCreateClass() {
+            @Override
+            public int onCreateJavaInstance(LuaState luaState) {
+                ShapeRenderer shapeRenderer = new ShapeRenderer();
+                int id = shapeRenderer.hashCode();
+                luaJavaInstances.put(id, shapeRenderer);
+                return id;
+            }
+
+            @Override
+            public void onDisposeJavaInstance(int javaInstanceId) {
+                luaJavaInstances.remove(javaInstanceId);
+            }
+        });
+
         LuaLibrary.registerMetaClassTableNewIndex(lua, LuaTableType.CLASS, rendererClassName, new DefaultNewIndexFunction());
         LuaLibrary.registerMetaClassTableNewIndex(lua, LuaTableType.CLASS_INSTANCE, rendererClassName, new DefaultNewIndexFunction());
 
@@ -31,17 +48,12 @@ public class LuaShapeRenderer {
         LuaLibrary.createEnumTable(lua, enumList);
         LuaLibrary.setMetaClassTable(lua, LuaTableType.CLASS, rendererClassName, "ShapeType");
 
-        LuaLibrary.setClassNewFunction(lua, rendererClassName, new LuaCreateClass() {
-            @Override
-            public Object onCreateClass(LuaState luaState) {
-                return new ShapeRenderer();
-            }
-        });
-
         LuaLibrary.setMetaClassFunction(lua, LuaTableType.CLASS_INSTANCE, rendererClassName, "Begin", new LuaFunction() {
             @Override
             public int onCall(LuaState luaState) {
-                Object javaInstance = LuaLibrary.getJavaInstance(lua, luaState);
+                int javaInstanceId = LuaLibrary.getJavaInstanceId(luaState);
+                Object javaInstance = luaJavaInstances.get(javaInstanceId);
+
                 if(javaInstance == null) {
                     return 0;
                 }
@@ -65,7 +77,9 @@ public class LuaShapeRenderer {
         LuaLibrary.setMetaClassFunction(lua, LuaTableType.CLASS_INSTANCE, rendererClassName, "End", new LuaFunction() {
             @Override
             public int onCall(LuaState luaState) {
-                Object javaInstance = LuaLibrary.getJavaInstance(lua, luaState);
+                int javaInstanceId = LuaLibrary.getJavaInstanceId(luaState);
+                Object javaInstance = luaJavaInstances.get(javaInstanceId);
+
                 if(javaInstance == null) {
                     return 0;
                 }
@@ -82,7 +96,9 @@ public class LuaShapeRenderer {
 
             @Override
             public int onCall(LuaState luaState) {
-                Object javaInstance = LuaLibrary.getJavaInstance(lua, luaState);
+                int javaInstanceId = LuaLibrary.getJavaInstanceId(luaState);
+                Object javaInstance = luaJavaInstances.get(javaInstanceId);
+
                 if(javaInstance == null) {
                     return 0;
                 }
@@ -120,7 +136,9 @@ public class LuaShapeRenderer {
 
             @Override
             public int onCall(LuaState luaState) {
-                Object javaInstance = LuaLibrary.getJavaInstance(lua, luaState);
+                int javaInstanceId = LuaLibrary.getJavaInstanceId(luaState);
+                Object javaInstance = luaJavaInstances.get(javaInstanceId);
+
                 if(javaInstance == null) {
                     return 0;
                 }

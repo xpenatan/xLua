@@ -16,7 +16,7 @@ public class LuaGdx {
         LuaShapeRenderer.register(lua);
 
 
-        LuaLibrary.registerClass(lua, LuaGdx.CLASSNAME, true, false);
+        LuaLibrary.registerClass(lua, LuaGdx.CLASSNAME, true, null);
 
         if(LuaLibrary.getMetaClassTable(lua, LuaTableType.CLASS, LuaGL20.CLASSNAME)) {
             LuaLibrary.setMetaClassTable(lua, LuaTableType.CLASS, LuaGdx.CLASSNAME, "gl");

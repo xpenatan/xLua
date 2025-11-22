@@ -15,7 +15,7 @@ public class LuaGL20 {
     public static void register(LuaExt lua) {
         LuaState luaState = lua.getLuaState();
 
-        LuaLibrary.registerClass(lua, CLASSNAME, true, false);
+        LuaLibrary.registerClass(lua, CLASSNAME, true, null);
 
         LuaLibrary.setMetaClassInt(lua, LuaTableType.CLASS, CLASSNAME, "GL_COLOR_BUFFER_BIT", GL20.GL_COLOR_BUFFER_BIT);
 
